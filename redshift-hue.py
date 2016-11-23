@@ -1,11 +1,13 @@
-import ConfigParser
+#!/usr/bin/python
+
+import configparser
 import datetime
 import logging
 import os
 import time
 
 from phue import Bridge
-from Pysolar.solar import GetAltitude
+from pysolar.solar import get_altitude
 from xdg.BaseDirectory import xdg_config_home
 
 
@@ -20,7 +22,7 @@ config_defaults = {
     'dimmable-lights': '1',
     'color-lights': '1',
 }
-config = ConfigParser.ConfigParser(config_defaults)
+config = configparser.ConfigParser(config_defaults)
 config.read([
     os.path.join(xdg_config_home, 'redshift.conf'),
     '/etc/redshift.conf',
@@ -29,7 +31,7 @@ config.read([
 try:
     lat = config.getfloat('manual', 'lat')
     lon = config.getfloat('manual', 'lon')
-except ConfigParser.NoOptionError:
+except configparser.NoOptionError:
     log.error('Latitude and longitude must be set.')
     raise
 log.debug(
@@ -51,11 +53,11 @@ log.debug(
 brightness = config.getfloat('redshift', 'brightness')
 try:
     brightness_day = config.getfloat('redshift', 'brightness-day')
-except ConfigParser.NoOptionError:
+except configparser.NoOptionError:
     brightness_day = brightness
 try:
     brightness_night = config.getfloat('redshift', 'brightness-night')
-except ConfigParser.NoOptionError:
+except configparser.NoOptionError:
     brightness_night = brightness
 
 bridge_address = config.get('hue', 'address')
@@ -105,7 +107,7 @@ def interpolate(elevation):
 
 while True:
     now = datetime.datetime.utcnow()
-    elevation = GetAltitude(lat, lon, now)
+    elevation = get_altitude(lat, lon, now)
     log.debug('Solar elevation: %f', elevation)
 
     temperature, brightness = interpolate(elevation)
@@ -120,3 +122,5 @@ while True:
     bridge.set_light(dimmable_lights, 'bri', int(brightness * 255))
 
     time.sleep(5.0)
+
+

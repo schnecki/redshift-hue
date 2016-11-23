@@ -1,3 +1,4 @@
-phue==0.8
-pysolar==0.6
-pyxdg==0.25
+phue
+pysolar
+pyxdg
+configparser
